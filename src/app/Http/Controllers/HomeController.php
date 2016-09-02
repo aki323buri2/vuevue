@@ -12,6 +12,7 @@ class HomeController extends Controller
 	{
 		Route::get('/', __CLASS__.'@index');
 		Route::get('/home', __CLASS__.'@index');
+		Route::get('/home/paste', __CLASS__.'@paste');
 	}
 
 	public function __construct()
@@ -21,5 +22,9 @@ class HomeController extends Controller
 	public function index(Request $request)
 	{
 		return View::make('home');
+	}
+	public function paste(Request $request)
+	{
+		return View::make('paste');
 	}
 }
