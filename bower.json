@@ -1,0 +1,27 @@
+{
+  "name": "html2",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "aki323buri2 <aki323buri2@gmail.com>"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+
+  , "dependencies": {
+    "jquery": "*"
+    , "jquery-ui": "*"
+    , "font-awesome": "*"
+    , "handsontable": "*"
+
+    , "bootstrap": "4.*"
+    , "vue": "*"
+  }
+}
