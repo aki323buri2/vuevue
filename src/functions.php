@@ -13,12 +13,16 @@ function extname_without_dot($path)
 {
 	return preg_replace('/^[.]/', '', extname($path));
 }
-function matrix($names, $values)
+function matrix($names, $values, $keyBy = null)
 {
 	$names = collect($names);
 	$combine = collect($values)->map(function ($values, $index) use ($names)
 	{
-		return $names->combine(array_pad($values, count($names), null));
+		return (object)$names->combine(array_pad($values, count($names), null))->toArray();
 	});
+	if (!is_null($keyBy))
+	{
+		$combine = $combine->keyBy($keyBy);
+	}
 	return $combine;
 }
