@@ -94,7 +94,8 @@ function catalogValidate(e, data, state)
 	})
 	.done(function (data)
 	{
-		$('#validate').html(data);
+		var table = $(data).find('table');
+		$('#validate').empty().append(table);
 	});
 }
 </script>
