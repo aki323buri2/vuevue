@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App;
 use Route;
 use View;
 use Illuminate\Routing\Controller;
@@ -15,6 +16,7 @@ class HomeController extends Controller
 		Route::get('/', __CLASS__.'@index');
 		Route::get('/home', __CLASS__.'@index');
 		Route::get('/home/paste', __CLASS__.'@paste');
+		Route::post('/home/validate', __CLASS__.'@validate');
 	}
 
 	protected $catalog;
@@ -36,6 +38,18 @@ class HomeController extends Controller
 		
 		return View::make('paste', [
 				'catalog' => $this->catalog, 
+			]);
+	}
+	public function validate(Request $request)
+	{
+		$this->catalog->get();
+
+		$data = $request->input('data');
+		$data = json_decode($data);
+		
+		return View::make('validate', [
+				'catalog' => $this->catalog, 
+				'data' => $data, 
 			]);
 	}
 }

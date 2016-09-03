@@ -7,6 +7,9 @@ $links = array_merge((array)@$links, [
 ]);
 
 $columns = $catalog->getColumns();
+
+$cache = @file_get_contents(App::basePath().'/storage/cache.json');
+$cache = (array)@json_decode($cache);
 ?>
 
 @section('main')
@@ -24,6 +27,13 @@ $columns = $catalog->getColumns();
 $(function ()
 {
 	var hot = handson($('#table1'));
+
+	$(hot.rootElement).on('catalog.validate', catalogValidate);
+
+	var data = JSON.parse('{!! json_encode($cache, JSON_UNESCAPED_UNICODE) !!}');
+	hot.loadData(data);
+	hot.setDataAtCell(0, 0, hot.getDataAtCell(0, 0));
+
 });
 function handson(el)
 {
@@ -58,9 +68,34 @@ function handsonAfterChange(changes, state)
 {
 	if (state === 'loadData') return;
 
-	var data = this.getSourceData();
+	var hot = this;
+	var data = hot.getData();
 
-	console.log([state, data]);
+	var objects = [];
+
+	$.each(data, function (row, values)
+	{
+		var object = {};
+		$.each(values, function (col, value)
+		{
+			var prop = hot.colToProp(col);
+			object[prop] = value;
+		});
+		objects.push(object);
+	});
+
+	$(hot.rootElement).trigger('catalog.validate', [objects, state]);
+}
+function catalogValidate(e, data, state)
+{
+	$.ajax({url: '/home/validate'
+		, type: 'post'
+		, data: { data: JSON.stringify(data) }
+	})
+	.done(function (data)
+	{
+		$('#validate').html(data);
+	});
 }
 </script>
 @endpush
