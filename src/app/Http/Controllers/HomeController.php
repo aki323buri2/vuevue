@@ -34,8 +34,7 @@ class HomeController extends Controller
 	}
 	public function paste(Request $request)
 	{
-		$this->catalog->get();
-		
+		$load = $this->catalog->get();
 		return View::make('paste', [
 				'catalog' => $this->catalog, 
 			]);

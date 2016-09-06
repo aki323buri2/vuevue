@@ -12,6 +12,16 @@ $cache = @file_get_contents(App::basePath().'/storage/cache.json');
 $cache = (array)@json_decode($cache);
 ?>
 
+@push('styles')
+<style>
+table tr > th
+{
+	text-align: center;
+	background: #ccc;
+}
+</style>
+@endpush
+
 @section('main')
 
 <p>コピー＆ペースト</p>
@@ -94,8 +104,8 @@ function catalogValidate(e, data, state)
 	})
 	.done(function (data)
 	{
-		var table = $(data).find('table');
-		$('#validate').empty().append(table);
+		var validate = $(data).find('table:first-child');
+		$('#validate').empty().append(validate);
 	});
 }
 </script>

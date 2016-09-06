@@ -1,34 +1,48 @@
 @extends('layouts/master')
+
 @section('main')
 
-<table class="table">
+<?php $columns = $catalog->getColumns()?>
+<table class="table table-sm table-bordered">
 	<thead>
 		<tr>
 			<th>#</th>
-			<th>First Name</th>
-			<th>Last Name</th>
-			<th>Username</th>
+			@foreach ($columns as $column)
+				<th
+					class="{{ $column->name }}"
+					data-name="{{ $column->name }}"
+					data-title="{{ $column->title }}"
+				>
+					{{ $column->title }}
+				</th>
+			@endforeach
+			<th class="process">
+				状況
+			</th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr>
-			<th scope="row">1</th>
-			<td>Mark</td>
-			<td>Otto</td>
-			<td>@mdo</td>
-		</tr>
-		<tr>
-			<th scope="row">2</th>
-			<td>Jacob</td>
-			<td>Thornton</td>
-			<td>@fat</td>
-		</tr>
-		<tr>
-			<th scope="row">3</th>
-			<td>Larry</td>
-			<td>the Bird</td>
-			<td>@twitter</td>
-		</tr>
+		<?php $no = 0?>
+		@foreach ($data as $row)
+			<tr>
+				<th scope="row">{{ ++$no }}</th>
+				@foreach ($columns as $column)
+					<?php $name = $column->name?>
+					<?php $value = @$row->$name?>
+					<td
+						class="{{ $name }}"
+						data-name="{{ $name }}"
+						data-value="{{ $value }}"
+					>
+						{{ $value }}
+					</td>
+				@endforeach 
+				<td class="process">
+					
+				</td>
+			</tr>
+		@endforeach
+		
 	</tbody>
 </table>
 

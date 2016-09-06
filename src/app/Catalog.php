@@ -3,6 +3,8 @@ namespace App;
 
 use App;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Database\DatabaseManager;
 
 class Catalog extends Model
 {
@@ -43,25 +45,107 @@ class Catalog extends Model
 			$this->casts[$name] = $this->columns->get($name)->type;
 		}
 
+		$this->primaryKey = $columns->first()->name;
 	}
 	public function getColumns()
 	{
 		return $this->columns;
 	}
-	
+
 	public function get($columns = ['*'])
 	{
-		$results = $this->loadFile($this->sourceFile);
+		$get = $this->loadFile($this->sourceFile);
 
-		return $results;
+		return $get;
 	}
+	public function save(array $options = [])
+	{
+		return $this->saveFile($this->sourceFile);
+	}
+
 	public function loadFile($file)
 	{
 		$load = @file_get_contents($file);
-		$load = (array)@json_decode($load);
+		$load = (array)@json_decode($load, true);
 
-		//
+		$entries = collect();
+		
+		foreach ($load as $load)
+		{
+			$entry = new static();
+		
+			foreach ($load as $name => $value)
+			{
+				$entry->setAttribute($name, $value);
+			}
+			
+			$entries->push($entry);
+		}
 
-		return $load;
+		return $entries;
 	}
+	public function saveFile($file)
+	{
+		$load = $this->loadFile($file);
+
+		$key = $this->getKey();
+
+		$append = true;
+
+		foreach ($load as &$object)
+		{
+			if ($object->getKey() === $key)
+			{
+				$object = $this;
+				$append = false;
+				break;
+			}
+		}
+
+		if ($append) $load->push($this);
+
+
+		$json = $load->map(function ($object, $index) 
+		{
+			return $object->toJson(JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT);
+		});
+
+		$json = "[\n".$json->implode("\n,\n")."\n]";
+
+		file_put_contents($file, $json);
+	}
+
+	public function find($id, $columns = ['*'])
+	{
+		if (is_array($id))
+		{
+			return $this->findMany($id, $columns);
+		}
+
+		$load = $this->get();
+
+		$find = $load->filter(function ($object, $index) use ($id)
+		{
+			return $object->getKey() === $id;
+		});
+
+		return $find->first();
+	}
+	public function findMany($ids, $columns = ['*'])
+	{
+		if (empty($ids))
+		{
+			return null;
+		}
+
+		$load = $this->get();
+
+		$find = $load->filter(function ($object, $index) use ($ids)
+		{
+			return in_array($object->getKey(), $ids, true/*type check*/);
+		});
+
+		return $find;
+	}
+
 }
