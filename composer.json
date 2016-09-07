@@ -10,6 +10,7 @@
     	"philo/laravel-blade": "*"
     	, "illuminate/routing": "*"
     	, "illuminate/database": "*"
+        , "illuminate/console": "*"
     }
     , "autoload": {
         "files": [
