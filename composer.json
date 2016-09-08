@@ -11,6 +11,7 @@
     	, "illuminate/routing": "*"
     	, "illuminate/database": "*"
         , "illuminate/console": "*"
+        , "symfony/process": "*"
     }
     , "autoload": {
         "files": [

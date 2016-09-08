@@ -19,6 +19,8 @@ class Application extends Container
 
 	public function __construct()
 	{
+		$this['env'] = '';
+
 		static::setInstance($this);
 		$this->instance('app', $this);
 		$this->instance('container', $this);
@@ -89,16 +91,21 @@ class Application extends Container
 		});
 	}
 
-	public function console($input, $output)
+	public function console()
 	{
 		$console = new Illuminate\Console\Application($this, $this['events'], $this->version);
-		return $console->run($input, $output);
+		return $console->run();
 	}
-
+	public function environment()
+	{
+		return $this['env'];
+	}
+	public function databasePath()
+	{
+		return $this->basePath().'/src/database';
+	}
 }
 
 $application = new Application;
 
-$input = new Symfony\Component\Console\Input\ArgvInput;
-$output = new Symfony\Component\Console\Output\ConsoleOutput;
-$application->console($input, $output);
+$status = $application->console();
