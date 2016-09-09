@@ -50,11 +50,13 @@ class Application extends Container
 			'Response' => Illuminate\Support\Facades\Response::class, 
 			'Input' => Illuminate\Support\Facades\Input::class, 
 		];
+		$this->facades = $facades;
 
 		Facade::setFacadeApplication($this);
 
-		spl_autoload_register(function ($alias) use ($facades)
+		spl_autoload_register(function ($alias)
 		{
+			$facades = static::getInstance()->facades;
 			$abstract = @$facades[$alias];
 			if (isset($abstract)) return class_alias($abstract, $alias);
 		}, true, true);

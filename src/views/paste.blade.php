@@ -10,6 +10,43 @@ $columns = $catalog->getColumns();
 
 $cache = @file_get_contents(App::basePath().'/storage/cache.json');
 $cache = (array)@json_decode($cache);
+
+
+$app = App::getInstance();
+$config = Config::getInstance();
+
+$database = [
+	'fetch' => PDO::FETCH_CLASS, 
+	'default' => 'sqlite', 
+	'connections' => [
+		'sqlite' => [
+			'driver' => 'sqlite', 
+			'database' => $app->basePath().'/storage/database.sqlite', 
+			'prefix' => '',
+		], 
+	], 
+	'migrations' => 'migrations', 
+];
+$prefix = 'database';
+foreach ($database as $key => $value)
+{
+	$config[$prefix.'.'.$key] = $value;
+}
+$providers = [
+	Illuminate\Database\DatabaseServiceProvider::class, 
+];
+foreach ($providers as $provider)
+{
+	(new $provider($app))->register();
+}
+$facades = [
+	'DB' => Illuminate\Support\Facades\DB::class, 
+	'Eloquent' => Illuminate\Database\Eloquent\Model::class, 
+];
+$app->facades = array_merge((array)$app->facades, $facades);
+
+// dump(DB::table('catalog')->get());
+
 ?>
 
 @push('styles')

@@ -29,9 +29,14 @@ class Application extends Container
 
 		// configration
 		$this->instance('config', new Fluent);
-		$config['database'] = [
+		$database = &$config['database'];
+
+		$database = [
 			'fetch' => PDO::FETCH_CLASS, 
-			'default' => 'mysql', 
+
+			'default' => 'sqlite', 
+			// 'default' => 'mysql', 
+			
 			'connections' => [
 				'sqlite' => [
 					'driver' => 'sqlite', 
@@ -52,7 +57,9 @@ class Application extends Container
 					'engine' => null, 
 				], 
 			], 
+			
 			'migrations' => 'migrations', 
+			
 			'redis' => [
 				'cluster' => false, 
 				'default' => [
@@ -63,6 +70,7 @@ class Application extends Container
 				], 
 			], 
 		];
+
 		foreach ($config as $prefix => $config)
 		{
 			foreach ($config as $name => $value)
@@ -89,6 +97,19 @@ class Application extends Container
 		{
 			return new Illuminate\Support\Composer($this['files'], $this->basePath());
 		});
+
+		// faades
+		$facades = [
+			// 'App' => Illuminate\Support\Facades\App::class, 
+			// 'DB' => Illuminate\Support\Facades\DB::class, 
+		];
+		Facade::setFacadeApplication($this);
+		spl_autoload_register(function ($alias) use ($facades)
+		{
+			$abstract = @$facades[$alias];
+			if (isset($abstract)) return class_alias($abstract, $alias);
+		}, true, true);
+
 	}
 
 	public function console()
