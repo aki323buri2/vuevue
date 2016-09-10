@@ -1,132 +1,63 @@
 #!/usr/bin/env php
+
 <?php
 require __DIR__.'/vendor/autoload.php';
 
-use Illuminate\Container\Container;
-use Illuminate\Support\Fluent;
-use Illuminate\Support\Facades\Facade;
+use App\Application\Application;
 
-class Application extends Container 
+$app = new Application(__DIR__);
+
+$app->registerProviders([
+	Illuminate\Database\DatabaseServiceProvider::class, 
+	Illuminate\Database\MigrationServiceProvider::class, 
+	Illuminate\Database\SeedServiceProvider::class, 
+]);
+
+// composer?
+$app->singleton('composer', function ($app)
 {
-	protected $version = '5.3';
+	return new Illuminate\Support\Composer($app['files'], $app->basePath());
+});
 
-	protected $basePath; 
+$database = [
+	'fetch' => PDO::FETCH_CLASS, 
+	'default' => 'sqlite', 
+	'connections' => [
+		'sqlite' => [
+			'driver' => 'sqlite', 
+			'database' => $app->basePath().'/storage/database.sqlite', 
+			'prefix' => '', 
+		], 
+		'mysql' => [
+			'driver' => 'mysql', 
+			'host' => 'localhost', 
+			'port' => '3306', 
+			'database' => basename($app->basePath()), 
+			'username' => 'shokuryu', 
+			'password' => 'shokuryu', 
+			'charset' => 'utf8', 
+			'collation' => 'utf8_unicode_ci', 
+			'prefix' => '', 
+			'strict' => false, 
+			'engine' => null, 
+		], 
+	], 
+	'migrations' => 'migrations', 
+	'redis' => [
+		'cluster' => false, 
+		'default' => [
+			'host' => 'localhost', 
+			'password' => 'shokuryu', 
+			'port' => 6379, 
+			'database' => 0, 
+		], 
+	], 
+];
 
-	public function basePath()
-	{
-		return $this->basePath;
-	}
+$app->addConfig(['database' => $database]);
 
-	public function __construct()
-	{
-		$this['env'] = '';
+$version = '5.3?';
 
-		static::setInstance($this);
-		$this->instance('app', $this);
-		$this->instance('container', $this);
+$console = new Illuminate\Console\Application($app, $app['events'], $version);
 
-		$this->basePath = realpath(__DIR__);
-
-		// configration
-		$this->instance('config', new Fluent);
-		$database = &$config['database'];
-
-		$database = [
-			'fetch' => PDO::FETCH_CLASS, 
-
-			'default' => 'sqlite', 
-			// 'default' => 'mysql', 
-			
-			'connections' => [
-				'sqlite' => [
-					'driver' => 'sqlite', 
-					'database' => $this->basePath().'/storage/database.sqlite', 
-					'prefix' => '', 
-				], 
-				'mysql' => [
-					'driver' => 'mysql', 
-					'host' => 'localhost', 
-					'posr' => '3306', 
-					'database' => basename($this->basePath()), 
-					'username' => 'shokuryu', 
-					'password' => 'shokuryu', 
-					'charset' => 'utf8', 
-					'collation' => 'utf8_unicode_ci', 
-					'prefix' => '', 
-					'strict' => false, 
-					'engine' => null, 
-				], 
-			], 
-			
-			'migrations' => 'migrations', 
-			
-			'redis' => [
-				'cluster' => false, 
-				'default' => [
-					'host' => 'locahost', 
-					'password' => 'shokuryu', 
-					'port' => 6379, 
-					'database' => 0, 
-				], 
-			], 
-		];
-
-		foreach ($config as $prefix => $config)
-		{
-			foreach ($config as $name => $value)
-			{
-				$this['config'][$prefix.'.'.$name] = $value;
-			}
-		}
-		
-		// prividers
-		$providers = [
-			Illuminate\Events\EventServiceProvider::class, 
-			Illuminate\Filesystem\FilesystemServiceProvider::class, 
-			Illuminate\Database\DatabaseServiceProvider::class, 
-			Illuminate\Database\MigrationServiceProvider::class, 
-			Illuminate\Database\SeedServiceProvider::class, 
-		];
-		foreach ($providers as $provider)
-		{
-			(new $provider($this))->register();
-		}
-
-		// composer..
-		$this->singleton('composer', function ($app)
-		{
-			return new Illuminate\Support\Composer($this['files'], $this->basePath());
-		});
-
-		// faades
-		$facades = [
-			// 'App' => Illuminate\Support\Facades\App::class, 
-			// 'DB' => Illuminate\Support\Facades\DB::class, 
-		];
-		Facade::setFacadeApplication($this);
-		spl_autoload_register(function ($alias) use ($facades)
-		{
-			$abstract = @$facades[$alias];
-			if (isset($abstract)) return class_alias($abstract, $alias);
-		}, true, true);
-
-	}
-
-	public function console()
-	{
-		$console = new Illuminate\Console\Application($this, $this['events'], $this->version);
-		return $console->run();
-	}
-	public function environment()
-	{
-		return $this['env'];
-	}
-	public function databasePath()
-	{
-		return $this->basePath().'/src/database';
-	}
-}
-
-$application = new Application;
-
-$status = $application->console();
+$status = $console->run();
