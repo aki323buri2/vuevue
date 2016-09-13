@@ -7,57 +7,6 @@ use App\Application\Application;
 
 $app = new Application(__DIR__);
 
-$app->registerProviders([
-	Illuminate\Database\DatabaseServiceProvider::class, 
-	Illuminate\Database\MigrationServiceProvider::class, 
-	Illuminate\Database\SeedServiceProvider::class, 
-]);
+$app->useMigration();
 
-// composer?
-$app->singleton('composer', function ($app)
-{
-	return new Illuminate\Support\Composer($app['files'], $app->basePath());
-});
-
-$database = [
-	'fetch' => PDO::FETCH_CLASS, 
-	'default' => 'sqlite', 
-	'connections' => [
-		'sqlite' => [
-			'driver' => 'sqlite', 
-			'database' => $app->basePath().'/storage/database.sqlite', 
-			'prefix' => '', 
-		], 
-		'mysql' => [
-			'driver' => 'mysql', 
-			'host' => 'localhost', 
-			'port' => '3306', 
-			'database' => basename($app->basePath()), 
-			'username' => 'shokuryu', 
-			'password' => 'shokuryu', 
-			'charset' => 'utf8', 
-			'collation' => 'utf8_unicode_ci', 
-			'prefix' => '', 
-			'strict' => false, 
-			'engine' => null, 
-		], 
-	], 
-	'migrations' => 'migrations', 
-	'redis' => [
-		'cluster' => false, 
-		'default' => [
-			'host' => 'localhost', 
-			'password' => 'shokuryu', 
-			'port' => 6379, 
-			'database' => 0, 
-		], 
-	], 
-];
-
-$app->addConfig(['database' => $database]);
-
-$version = '5.3?';
-
-$console = new Illuminate\Console\Application($app, $app['events'], $version);
-
-$status = $console->run();
+$app->runConsole();

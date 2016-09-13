@@ -5,3 +5,4 @@
 /public/vendor
 
 /storage/*.sqlite
+/src/database/*.sqlite

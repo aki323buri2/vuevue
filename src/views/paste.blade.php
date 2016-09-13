@@ -12,33 +12,7 @@ $cache = @file_get_contents(App::basePath().'/storage/cache.json');
 $cache = (array)@json_decode($cache);
 
 
-$app = App::getInstance();
-
-$database = [
-	'fetch' => PDO::FETCH_CLASS, 
-	'default' => 'sqlite', 
-	'connections' => [
-		'sqlite' => [
-			'driver' => 'sqlite', 
-			'database' => $app->basePath().'/storage/database.sqlite', 
-			'prefix' => '',
-		], 
-	], 
-	'migrations' => 'migrations', 
-];
-
-$providers = [
-	Illuminate\Database\DatabaseServiceProvider::class, 
-];
-
-$facades = [
-	'DB' => Illuminate\Support\Facades\DB::class, 
-	'Eloquent' => Illuminate\Database\Eloquent\Model::class, 
-];
-
-$app->addConfig(['database' => $database]);
-$app->registerProviders($providers);
-$app->addFacades($facades);
+$app->useDatabase();
 
 // dump(DB::table('catalog')->get());
 

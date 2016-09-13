@@ -4,11 +4,15 @@ namespace App\Application;
 use Illuminate\Container\Container;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Console\Application as ConsoleApplication;
+use Illuminate\Support\Composer;
 
 use Route;
 
 class Application extends Container 
 {
+	const VERSION = '5.3';
+
 	/**
 	 * application base path
 	 * 
@@ -202,4 +206,88 @@ class Application extends Container
 		return $this->basePath().'/src/database';
 	}
 
+	/**
+	 * config path 
+	 * 
+	 * @return string
+	 */
+	public function configPath()
+	{
+		return $this->basePath().'/src/config';
+	}
+
+	/**
+	 * load config
+	 * 
+	 * @param  string  $type
+	 * @return array
+	 */
+	public function loadConfig($type)
+	{
+		$load = require $this->configPath().DIRECTORY_SEPARATOR.$type.'.php';
+
+		$config = [$type => $load];
+
+		return $this->addConfig($config);
+	}
+
+	/**
+	 * use database
+	 * 
+	 * @return static
+	 */
+	public function useDatabase()
+	{
+	
+		$this->registerProviders([
+			\Illuminate\Database\DatabaseServiceProvider::class, 
+		]);
+
+		$this->loadConfig('database');
+
+		$this->addFacades([
+			'DB' => \Illuminate\Support\Facades\DB::class, 
+			'Eloquent' => \Illuminate\Database\Eloquent\Model::class, 
+		]);
+
+		return $this;
+	}
+
+	/**
+	 * use migration
+	 * 
+	 * @return static
+	 */
+	public function useMigration()
+	{
+		$this->registerProviders([
+			\Illuminate\Database\DatabaseServiceProvider::class, 
+			\Illuminate\Database\MigrationServiceProvider::class, 
+			\Illuminate\Database\SeedServiceProvider::class, 
+		]);
+
+		$this->loadConfig('database');
+
+		// composer?
+		$this->singleton('composer', function ($app)
+		{
+			return new Composer($app['files'], $app->basePath());
+		});
+
+		return $this;
+	}
+
+	/**
+	 * run console application
+	 * 
+	 * @return int
+	 */
+	public function runConsole()
+	{
+		$console = new ConsoleApplication($this, $this['events'], static::VERSION);
+
+		return $console->run();
+	}
+
+	
 }
