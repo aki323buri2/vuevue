@@ -103,14 +103,24 @@ function handsonAfterChange(changes, state)
 }
 function catalogValidate(e, data, state)
 {
+	var selector = '#validate';
+	var container = $(selector);
+
 	$.ajax({url: '/home/validate'
 		, type: 'post'
-		, data: { data: JSON.stringify(data) }
+		, data: { selector: selector, data: JSON.stringify(data) }
 	})
 	.done(function (data)
 	{
-		var validate = $(data).find('table:first-child');
-		$('#validate').empty().append(validate);
+		var $data = $(data);
+		var validate = $data.find('table:first-child');
+		var script = $data.find('script');
+		container
+			.empty()
+			.append(validate)
+			.append(script)
+		;
+
 	});
 }
 </script>

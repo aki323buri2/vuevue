@@ -17,12 +17,14 @@ class HomeController extends Controller
 		Route::get('/home', __CLASS__.'@index');
 		Route::get('/home/paste', __CLASS__.'@paste');
 		Route::post('/home/validate', __CLASS__.'@validate');
+		Route::get('/home/confirm', __CLASS__.'@confirm');
 	}
 
 	protected $catalog;
 
 	public function __construct()
 	{
+		App::useDatabase();
 		$this->catalog = new Catalog;
 	}
 
@@ -43,12 +45,25 @@ class HomeController extends Controller
 	{
 		$this->catalog->get();
 
-		$data = $request->input('data');
+		$selector = $request->input('selector');
+
+		$data = $request->input('data', '[]');
 		$data = json_decode($data);
 		
 		return View::make('validate', [
 				'catalog' => $this->catalog, 
+				'selector' => $selector, 
 				'data' => $data, 
 			]);
+	}
+	public function confirm(Request $request)
+	{
+
+		$catalog = $this->catalog;
+		$catno = $request->input('catno');
+
+		$catalog->find($catno);
+
+		return $catalog->all()->toJson();
 	}
 }

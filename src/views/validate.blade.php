@@ -46,4 +46,31 @@
 	</tbody>
 </table>
 
+<script>
+$(function ()
+{
+	var selector = '{{ $selector ?: 'body' }}';
+	var container = $(selector);
+	var table = container.find('table');
+	var tbody = table.find('tbody');
+	table.find('tr').each(function ()
+	{
+		validate($(this));
+	});
+
+	function validate(tr)
+	{
+		var catno = tr.find('.catno').data('value');
+		$.ajax({
+			url: '/home/confirm'
+			, data: { catno: catno }
+		})
+		.done(function (data)
+		{
+			console.log(data);
+		});
+	};
+});
+</script>
+
 @endsection

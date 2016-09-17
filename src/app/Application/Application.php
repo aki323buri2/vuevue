@@ -8,6 +8,8 @@ use Illuminate\Console\Application as ConsoleApplication;
 use Illuminate\Support\Composer;
 
 use Route;
+use DB;
+use Eloquent;
 
 class Application extends Container 
 {
@@ -249,6 +251,8 @@ class Application extends Container
 			'DB' => \Illuminate\Support\Facades\DB::class, 
 			'Eloquent' => \Illuminate\Database\Eloquent\Model::class, 
 		]);
+
+		Eloquent::setConnectionResolver($this['db']);
 
 		return $this;
 	}
