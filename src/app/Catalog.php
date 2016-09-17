@@ -12,6 +12,8 @@ class Catalog extends Model
 
 	protected $table = 'catalog';
 
+	protected $id = 'catno';
+
 	public function __construct()
 	{
 		parent::__construct();

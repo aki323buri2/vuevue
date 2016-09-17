@@ -53,23 +53,38 @@ $(function ()
 	var container = $(selector);
 	var table = container.find('table');
 	var tbody = table.find('tbody');
-	table.find('tr').each(function ()
+	tbody.find('tr').each(function ()
 	{
-		validate($(this));
+		getDirty($(this));
 	});
 
-	function validate(tr)
+	function getDirty(tr)
 	{
-		var catno = tr.find('.catno').data('value');
+		var record = JSON.stringify(recordFromTr(tr));
+
 		$.ajax({
-			url: '/home/confirm'
-			, data: { catno: catno }
+			url: '/home/dirty'
+			, data: { record: record }
 		})
 		.done(function (data)
 		{
 			console.log(data);
 		});
 	};
+	function recordFromTr(tr)
+	{
+		record = {};
+
+		tr.find('td[data-value]').each(function ()
+		{
+			var td = $(this);
+			var name = td.data('name');
+			var value = td.data('value');
+			record[name] = value;
+		});
+
+		return record;
+	}
 });
 </script>
 

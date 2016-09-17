@@ -17,7 +17,7 @@ class HomeController extends Controller
 		Route::get('/home', __CLASS__.'@index');
 		Route::get('/home/paste', __CLASS__.'@paste');
 		Route::post('/home/validate', __CLASS__.'@validate');
-		Route::get('/home/confirm', __CLASS__.'@confirm');
+		Route::get('/home/dirty', __CLASS__.'@dirty');
 	}
 
 	protected $catalog;
@@ -56,14 +56,21 @@ class HomeController extends Controller
 				'data' => $data, 
 			]);
 	}
-	public function confirm(Request $request)
+	public function dirty(Request $request)
 	{
 
 		$catalog = $this->catalog;
-		$catno = $request->input('catno');
+		$record = $request->input('record', '[]');
+		$record = json_decode($record);
 
-		$catalog->find($catno);
+		$catalog->find($record->catno);
 
-		return $catalog->all()->toJson();
+
+		foreach ($record as $name => $value)
+		{
+			$catalog->$name = $value;
+		}
+
+		return json_encode($catalog->getDirty(), JSON_UNESCAPED_UNICODE);
 	}
 }
