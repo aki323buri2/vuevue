@@ -65,12 +65,18 @@ class HomeController extends Controller
 
 		$catalog->find($record->catno);
 
-
 		foreach ($record as $name => $value)
 		{
 			$catalog->$name = $value;
 		}
+		
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		sleep(rand(0, 2));
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-		return json_encode($catalog->getDirty(), JSON_UNESCAPED_UNICODE);
+		return json_encode([
+			'exists' => $catalog->exists(), 
+			'dirty' => $catalog->getDirty(), 
+		], JSON_UNESCAPED_UNICODE);
 	}
 }

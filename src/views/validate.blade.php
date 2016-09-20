@@ -49,6 +49,8 @@
 <script>
 $(function ()
 {
+	extendJQuery();
+
 	var selector = '{{ $selector ?: 'body' }}';
 	var container = $(selector);
 	var table = container.find('table');
@@ -58,9 +60,12 @@ $(function ()
 		getDirty($(this));
 	});
 
+
 	function getDirty(tr)
 	{
 		var record = JSON.stringify(recordFromTr(tr));
+
+		tr.processShow('・・・確認しています・・・');
 
 		$.ajax({
 			url: '/home/dirty'
@@ -68,7 +73,8 @@ $(function ()
 		})
 		.done(function (data)
 		{
-			console.log(data);
+			var object = JSON.parse(data);
+			tr.apply(object);
 		});
 	};
 	function recordFromTr(tr)
@@ -85,6 +91,42 @@ $(function ()
 
 		return record;
 	}
+	function extendJQuery()
+	{
+		$.fn.processShow = function (text)
+		{
+			var tr = this;
+			var td = tr.find('.process');
+			td.text(text);
+
+			return this;
+		};
+		$.fn.apply = function (object)
+		{
+			var tr = this;
+			
+			var exists = object.exists;
+			var dirty = object.dirty;
+			
+			if (!exists) tr.addClass('insert');
+
+			$.each(dirty, function (name, value)
+			{
+				var td = tr.find('.' + name);
+				td.addClass('dirty');
+			});
+
+			var text = 
+				  (tr.hasClass('insert') ? '新規登録'
+				: (tr.hasClass('update') ? '登録の修正'
+				: ''))
+				;
+			tr.processShow(text);
+
+			return this;
+
+		};
+	};
 });
 </script>
 
