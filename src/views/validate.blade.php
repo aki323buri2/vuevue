@@ -207,7 +207,7 @@ $(function ()
 			});
 
 			var operation = 
-					(tr.hasClass('insert') ? {color: 'danger' , icon: 'plus', text: '新規登録'}
+				  (tr.hasClass('insert') ? {color: 'danger' , icon: 'plus', text: '新規登録'}
 				: (tr.hasClass('update') ? {color: 'primary', icon: 'edit', text: '登録の修正'}
 				: ''))
 				;
@@ -265,7 +265,9 @@ $(function ()
 			$.each(todo, function (index, todo)
 			{
 				var catno = todo.catno;
-				console.log(todo.catno);
+				var dirty = todo.dirty;
+
+
 			});
 
 			return this;
