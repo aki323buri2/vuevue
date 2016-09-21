@@ -24,27 +24,6 @@ table tr > th
 	text-align: center;
 	background: #ccc;
 }
-
-#validate table:first-child tr.insert > th:first-child
-{
-	background: #c0392b;
-	color: #fff;
-}
-#validate table:first-child tr.insert > td.dirty
-{
-	color: #d35400;
-	font-weight: bold;
-}
-#validate table:first-child tr.update > th:first-child
-{
-	background: #2980b9;
-	color: #fff;
-}
-#validate table:first-child tr.update > td.dirty
-{
-	color: #16a085;
-	font-weight: bold;
-}
 </style>
 @endpush
 
@@ -135,10 +114,12 @@ function catalogValidate(e, data, state)
 	{
 		var $data = $(data);
 		var validate = $data.find('table:first-child');
+		var style = $data.find('style');
 		var script = $data.find('script');
 		container
 			.empty()
 			.append(validate)
+			.append(style)
 			.append(script)
 		;
 

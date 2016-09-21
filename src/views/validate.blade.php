@@ -46,20 +46,38 @@
 	</tbody>
 </table>
 
+<?php if (!$selector) $selector = 'body'?>
+<style>
+{{ $selector }} table:first-child .process
+{
+	width: 20rem;
+}
+{{ $selector }} table:first-child tbody > tr > * > .tag
+{
+	position: absolute;
+	margin-left: -3rem;
+}
+{{ $selector }} table:first-child tbody > tr > .dirty
+{
+	font-weight: bold;
+	background: #f1c40f;
+}
+</style>
+
 <script>
 $(function ()
 {
 	extendJQuery();
 
-	var selector = '{{ $selector ?: 'body' }}';
+	var selector = '{{ $selector }}';
 	var container = $(selector);
+	
 	var table = container.find('table');
 	var tbody = table.find('tbody');
 	tbody.find('tr').each(function ()
 	{
 		getDirty($(this));
 	});
-
 
 	function getDirty(tr)
 	{
@@ -74,7 +92,7 @@ $(function ()
 		.done(function (data)
 		{
 			var object = JSON.parse(data);
-			tr.apply(object);
+			tr.applyObject(object);
 		});
 	};
 	function recordFromTr(tr)
@@ -91,24 +109,36 @@ $(function ()
 
 		return record;
 	}
+	//================================================
+	//================================================
+	//================================================
 	function extendJQuery()
 	{
 		$.fn.processShow = function (text)
 		{
 			var tr = this;
+			
 			var td = tr.find('.process');
+			
 			td.text(text);
 
 			return this;
 		};
-		$.fn.apply = function (object)
+		$.fn.applyObject = function (object)
 		{
 			var tr = this;
 			
 			var exists = object.exists;
-			var dirty = object.dirty;
+			var dirty  = object.dirty;
 			
-			if (!exists) tr.addClass('insert');
+			if (!exists)
+			{
+				tr.addClass('insert');
+			}
+			else if (dirty.length())
+			{
+				tr.addClass('update');
+			}
 
 			$.each(dirty, function (name, value)
 			{
@@ -116,16 +146,24 @@ $(function ()
 				td.addClass('dirty');
 			});
 
-			var text = 
-				  (tr.hasClass('insert') ? '新規登録'
-				: (tr.hasClass('update') ? '登録の修正'
+			var type = 
+				  (tr.hasClass('insert') ? {color: 'danger' , icon: 'plus', text: '新規登録'}
+				: (tr.hasClass('update') ? {color: 'primary', icon: 'edit', text: '登録の修正'}
 				: ''))
 				;
-			tr.processShow(text);
+			tr.processShow(type.text);
+
+			var th = tr.find('th:first-child');
+
+			var tag = $('<span>')
+				.appendTo(th)
+				.addClass('tag tag-pill tag-' + type.color)
+				.append($('<i>').addClass('fa fa-' + type.icon))
+			;
 
 			return this;
-
 		};
+
 	};
 });
 </script>
