@@ -71,7 +71,7 @@ class HomeController extends Controller
 		}
 		
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		sleep(rand(0, 2));
+		// sleep(rand(0, 1));
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		return json_encode([

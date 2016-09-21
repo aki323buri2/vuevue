@@ -113,16 +113,15 @@ function catalogValidate(e, data, state)
 	.done(function (data)
 	{
 		var $data = $(data);
-		var validate = $data.find('table:first-child');
+		var validate = $data.find('.validate');
 		var style = $data.find('style');
 		var script = $data.find('script');
 		container
 			.empty()
-			.append(validate)
 			.append(style)
+			.append(validate)
 			.append(script)
 		;
-
 	});
 }
 </script>
