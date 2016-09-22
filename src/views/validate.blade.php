@@ -87,10 +87,9 @@
 {
 	opacity: .5;
 }
-{{ $selector }} .validate table tbody > * > .dirty
+{{ $selector }} .validate table tbody > tr > .dirty
 {
 	font-weight: bold;
-	background: #f1c40f;
 }
 </style>
 
@@ -204,6 +203,10 @@ $(function ()
 			{
 				var td = tr.find('.' + name);
 				td.addClass('dirty');
+				exists 
+					? (td.addClass('table-info'))
+					: (td.addClass('table-danger'))
+				;
 			});
 
 			var operation = 
