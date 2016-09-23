@@ -17,7 +17,8 @@ class HomeController extends Controller
 		Route::get('/home', __CLASS__.'@index');
 		Route::get('/home/paste', __CLASS__.'@paste');
 		Route::post('/home/validate', __CLASS__.'@validate');
-		Route::get('/home/dirty', __CLASS__.'@dirty');
+		Route::post('/home/dirty', __CLASS__.'@dirty');
+		Route::post('/home/save', __CLASS__.'@save');
 	}
 
 	protected $catalog;
@@ -77,6 +78,41 @@ class HomeController extends Controller
 		return json_encode([
 			'exists' => $catalog->exists(), 
 			'dirty' => $catalog->getDirty(), 
+		], JSON_UNESCAPED_UNICODE);
+	}
+	public function save(Request $request)
+	{
+		$catalog = $this->catalog;
+		$operation = $request->input('operation');
+		$catno = $request->input('catno');
+		$dirty = $request->input('dirty', '[]');
+		$dirty = json_decode($dirty);
+
+		$catalog->find($catno);
+
+
+
+		foreach ($dirty as $name => $value)
+		{
+			$catalog->$name = $value;
+		}
+
+		$exists = $catalog->exists();
+
+		if ($operation === 'insert' && $exists)
+		{
+			throw 'catno:'.$catno.' exists!!(can\'t insert)';
+		}
+		else if ($operation === 'update' && !$exists)
+		{
+			throw 'catno:'.$catno.' not exists!!(can\'t update)';
+		}
+
+		$save = $catalog->save();
+
+		return json_encode([
+			'save' => $save , 
+			'dirty' => $dirty, 
 		], JSON_UNESCAPED_UNICODE);
 	}
 }

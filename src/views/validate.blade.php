@@ -2,10 +2,11 @@
 
 @section('main')
 
-<?php $columns = $catalog->getColumns()?>
 
 <div class="validate">
 	
+	<?php $columns = $catalog->getColumns() ?>
+
 	<div class="operation-panel collapse">
 		<div class="group">
 			<button type="button" class="btn btn-primary save" >
@@ -23,7 +24,7 @@
 				@foreach ($columns as $column)
 					<th
 						class="{{ $column->name }}"
-						data-name="{{ $column->name }}"
+						data-name="{{ $column->name }}"	
 						data-title="{{ $column->title }}"
 					>
 						{{ $column->title }}
@@ -96,215 +97,155 @@
 <script>
 $(function ()
 {
-	//================================================
-	extendJQuery();
-	//================================================
 
-	var selector = '{{ $selector }}';
-	var container = $(selector);
-
-	var panel = container.find('.operation-panel');
-
-	var save = panel.find('button.save');
-	
+	var container = $('{{ $selector }}');
 	var table = container.find('table');
-	var tbody = table.find('tbody');
+	var panel = container.find('.operation-panel');
+	
+	loadPlugins();
 
-	tbody.find('tr').each(function ()
+	table.validate();
+
+	function loadPlugins()
 	{
-		getDirty($(this));
-	});
-
-	save.on('click', saveClick);
-
-	function getDirty(tr)
-	{
-		var record = JSON.stringify(recordFromTr(tr));
-
-		tr.processShow('・・・確認しています・・・');
-
-		table.initProcess();
-
-		$.ajax({
-			url: '/home/dirty'
-			, data: { record: record }
-		})
-		.done(function (data)
+		$.fn.validate = function ()
 		{
-			var object = JSON.parse(data);
-			tr.applyObject(object);
-		});
-	};
-	function recordFromTr(tr)
-	{
-		record = {};
-
-		tr.find('td[data-value]').each(function ()
-		{
-			var td = $(this);
-			var name = td.data('name');
-			var value = td.data('value');
-			record[name] = value;
-		});
-
-		return record;
-	};
-	function saveClick(e)
-	{
-		table.save();
-	};
-	//================================================
-	//================================================
-	//================================================
-	function extendJQuery()
-	{
-		$.fn.initProcess = function ()
-		{
-			this.find('tbody > tr').addClass('doing');
-
-			return this;
-		};
-		$.fn.doingProcess = function ()
-		{
-			return this.siblings('.doing');
-		};
-		$.fn.markAsDoneProccess = function ()
-		{
-			this.removeClass('doing');
-
-			if (this.doingProcess().length === 0)
+			if (this.get(0).tagName.toLowerCase() === 'table')
 			{
-				panel.collapse('show');
+				this.find('tbody tr')
+					.addClass('validating')
+					.validate()
+				;
+				return this;
 			}
 
-			return this;
-		};
-		$.fn.processShow = function (text)
-		{
-			return this.find('.process').text(text);
-		};
-		$.fn.applyObject = function (object)
-		{
-			var tr = this;
-			
-			var exists = object.exists;
-			var dirty	= object.dirty;
-			
-			if (!exists)
+			return this.each(function ()
 			{
-				tr.addClass('insert');
-			}
-			else if (dirty.length())
+				var tr = $(this);
+				var object = tr.find('td[data-name]').tds2object();
+				$.ajax({url: '/home/dirty'
+					, type: 'post'
+					, data: { record: JSON.stringify(object) }
+				})
+				.done(function (data)
+				{
+					tr.removeClass('validating');
+					tr.trigger('validate:dirty', [JSON.parse(data)]);
+				});
+				return tr;
+			});
+		};
+		$.fn.tds2object = function ()
+		{
+			var object = {}
+			this.each(function ()
 			{
-				tr.addClass('update');
-			}
+				var td = $(this);
+				var name = td.data('name');
+				var value = td.data('value');
+				object[name] = value;
+			});
+			return object;
+		};
+
+		table.on('validate:dirty', 'tbody tr', function (e, data)
+		{
+			var tr = $(this);
+			var exists = data.exists;
+			var dirty = data.dirty;
+
+			if (exists && dirty.length === 0) return;
+
+			var operation = !exists 
+				? {name: 'insert', color: 'danger', icon: 'plus', title: '新規作成'}
+				: {name: 'update', color: 'info'  , icon: 'edit', title: '修正登録'}
+			;
+
+			tr.data('operation', operation.name);
+			tr.addClass('dirty ' + operation.name);
+
+			var tag = $('<span>')
+				.addClass('tag tag-pill tag-' + operation.color)
+				.append($('<i>').addClass('fa fa-' + operation.icon))
+				.prependTo(tr.find('th:first-child+td'))
+			;
+
+			tr.find('.process').text(operation.title);
 
 			$.each(dirty, function (name, value)
 			{
 				var td = tr.find('.' + name);
-				td.addClass('dirty');
-				exists 
-					? (td.addClass('table-info'))
-					: (td.addClass('table-danger'))
-				;
+				td.addClass('dirty table-' + operation.color);
 			});
 
-			var operation = 
-				  (tr.hasClass('insert') ? {color: 'danger' , icon: 'plus', text: '新規登録'}
-				: (tr.hasClass('update') ? {color: 'primary', icon: 'edit', text: '登録の修正'}
-				: ''))
-				;
-			tr.processShow(operation.text);
-
-			var target = tr.find('th:first-child+td');
-
-			var tag = tagPill(operation.color)
-				.append(faIcon(operation.icon))
-				.prependTo(target)
-			;
-
-			tag.data({
-					toggle: 'tooltip'
-				, placement: 'right'
-				, title: operation.text
-			}).tooltip();
-
-			tag.on('click', tagClick);
-
-			tr.markAsDoneProccess();
-
-
-			return this;
-		};
-
-		var faIcon = function (icon)
-		{
-			return $('<i>').addClass('fa fa-' + icon);
-		};
-		var tagPill = function (color)
-		{
-			return $('<span>').addClass('tag tag-pill tag-' + color);
-		};
-		var tagClick = function (e)
-		{
-			var tr = $(this).closest('tr');
-
-			tr.lockThis(!tr.locked());
-		};
-		$.fn.lockThis = function (lock)
-		{
-			var tr = $(this);
-			return lock ? tr.addClass('locked') : tr.removeClass('locked');
-		};
-		$.fn.locked = function ()
-		{
-			return $(this).hasClass('locked');
-		};
-
-		$.fn.save = function ()
-		{
-			var todo = this.getTodo();
-
-			$.each(todo, function (index, todo)
+			if (tr.parent().find('.vaidating').length === 0)
 			{
-				var catno = todo.catno;
-				var dirty = todo.dirty;
-
-
-			});
-
-			return this;
-		};
-		$.fn.getTodo = function ()
+				tr.closest('table').trigger('validate:dirty-check-complete');
+			}
+		});
+		table.on('validate:dirty-check-complete', function (e)
 		{
-			var tr = $(this);
-			var todo = [];
-			tr.find('tbody > tr:not(.locked)').each(function ()
-			{
-				var dirty = $(this).dirtyToObject();
-				if (dirty === null) return;
-
-				todo.push(dirty);
-			});
-
-			return todo;
-		};
-		$.fn.dirtyToObject = function ()
+			panel.collapse('show');
+		});
+		table.on('click', '.tag', function (e)
+		{
+			$(this).closest('tr').toggleLocked();
+		});
+		$.fn.toggleLocked = function ()
 		{
 			var tr = this;
-			var catno = tr.find('.catno').data('value');
-			var object = {};
-
-			tr.find('.dirty').each(function ()
-			{
-				var dirty = $(this).data();
-				object[dirty.name] = dirty.value;
-			});
-
-			if (Object.keys(object) === 0) return null;
-
-			return {catno: catno, dirty: object};
+			return !tr.hasClass('locked') ? tr.addClass('locked') : tr.removeClass('locked');
 		};
+		panel.on('click', '.save', function (e)
+		{
+			table.save();
+		});
+		$.fn.save = function ()
+		{
+			if (this.get(0).tagName.toLowerCase() === 'table')
+			{
+				this.find('tbody tr.dirty:not(.locked)')
+					.addClass('saving')
+					.save()
+				;
+				return this;
+			}
+
+			return this.each(function ()
+			{
+				var tr = $(this);
+				var catno = tr.find('.catno').data('value');
+				var dirty = tr.find('td.dirty').tds2object();
+				var operation = tr.data('operation');
+				$.ajax({url: '/home/save'
+					, type: 'post'
+					, data: {operation: operation, catno: catno, dirty: JSON.stringify(dirty)}
+				})
+				.done(function (data)
+				{
+					console.log('??');
+					// console.log($(data).text());
+					tr.trigger('validate:saved', [data]);
+				});
+
+				return tr;
+			});
+		};
+		JSON.tryParse = function (text)
+		{
+			try 
+			{
+				return JSON.parse(text);
+			}
+			catch (e)
+			{
+				return null;
+			}
+		};
+		table.on('validate:saved', 'tbody tr', function (e, data)
+		{
+			console.log(data);
+		});
 	};
 });
 </script>
