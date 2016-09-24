@@ -5,7 +5,6 @@
 
 <div class="validate">
 	
-	<?php $columns = $catalog->getColumns() ?>
 
 	<div class="operation-panel collapse">
 		<div class="group">
@@ -16,6 +15,7 @@
 		</div>
 	</div>
 
+	<?php $columns = $catalog->getColumns();?>
 	<table class="table table-sm table-bordered">
 		<thead>
 			<tr>
@@ -37,14 +37,15 @@
 			</tr>
 		</thead>
 		<tbody>
-			<?php $no = 0?>
+			
+			<?php $no = 0;?>
 			@foreach ($data as $row)
 				<tr>
 					<th scope="row">{{ ++$no }}</th>
 					
 					@foreach ($columns as $column)
-						<?php $name = $column->name?>
-						<?php $value = @$row->$name?>
+						<?php $name = $column->name;?>
+						<?php $value = $row->$name;?>
 						<td
 							class="{{ $name }}"
 							data-name="{{ $name }}"

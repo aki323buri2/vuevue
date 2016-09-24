@@ -8,15 +8,34 @@ use Illuminate\Database\DatabaseManager;
 
 class Catalog extends Model
 {
-	protected $columns;
+	protected static $columns;
 
 	protected $table = 'catalog';
-
+	
 	protected $id = 'catno';
 
 	public function __construct()
 	{
 		parent::__construct();
+
+		static::initColumns();
+
+		$columns = static::$columns;
+
+		$names = $columns->pluck('name');
+
+		foreach ($names as $name)
+		{
+			$this->setAttribute($name, null);
+
+			$this->casts[$name] = $columns->get($name)->type;
+		}
+
+		$this->primaryKey = $columns->first()->name;
+	}
+	protected static function initColumns()
+	{
+		if (static::$columns !== null) return;
 
 		$columns = matrix(
 			['name', 'type', 'title']
@@ -36,21 +55,12 @@ class Catalog extends Model
 			]
 			, 'name'
 		);
-		$this->columns = $columns;
+		static::$columns = $columns;
 
-		$names = $columns->pluck('name');
-
-		foreach ($names as $name)
-		{
-			$this->setAttribute($name, null);
-
-			$this->casts[$name] = $this->columns->get($name)->type;
-		}
-
-		$this->primaryKey = $columns->first()->name;
 	}
+
 	public function getColumns()
 	{
-		return $this->columns;
+		return static::$columns;
 	}
 }

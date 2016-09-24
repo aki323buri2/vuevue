@@ -31,8 +31,10 @@ class HomeController extends Controller
 
 	public function index(Request $request)
 	{
+		$catalog = $this->catalog;
+
 		return View::make('home', [
-				'catalog' => $this->catalog, 
+				'catalog' => $catalog, 
 			]);
 	}
 	public function paste(Request $request)

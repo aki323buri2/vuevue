@@ -49,7 +49,8 @@ $(function ()
 		var data = JSON.parse('{!! json_encode($cache, JSON_UNESCAPED_UNICODE) !!}');
 		hot.loadData(data);
 		hot.setDataAtCell(0, 0, hot.getDataAtCell(0, 0));
-	});
+	})
+	();
 });
 function handson(el)
 {

@@ -249,6 +249,7 @@ class Application extends Container
 
 		$this->addFacades([
 			'DB' => \Illuminate\Support\Facades\DB::class, 
+			'Schema' => \Illuminate\Support\Facades\Schema::class, 
 			'Eloquent' => \Illuminate\Database\Eloquent\Model::class, 
 		]);
 
