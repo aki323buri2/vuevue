@@ -64,7 +64,12 @@ class HomeController extends Controller
 		$record = $request->input('record', '[]');
 		$record = json_decode($record);
 
-		$catalog->find($record->catno);
+		$catalog = $catalog->find($record->catno);
+		$exists = !is_null($catalog);
+		if (!$exists)
+		{
+			$catalog = new Catalog;
+		}
 
 		foreach ($record as $name => $value)
 		{
@@ -76,7 +81,7 @@ class HomeController extends Controller
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		return json_encode([
-			'exists' => $catalog->exists(), 
+			'exists' => $exists,  
 			'dirty' => $catalog->getDirty(), 
 		], JSON_UNESCAPED_UNICODE);
 	}
@@ -88,16 +93,8 @@ class HomeController extends Controller
 		$dirty = $request->input('dirty', '[]');
 		$dirty = json_decode($dirty);
 
-		$catalog->find($catno);
-
-
-
-		foreach ($dirty as $name => $value)
-		{
-			$catalog->$name = $value;
-		}
-
-		$exists = $catalog->exists();
+		$catalog = $catalog->find($catno);
+		$exists = !is_null($catalog);
 
 		if ($operation === 'insert' && $exists)
 		{
@@ -107,6 +104,19 @@ class HomeController extends Controller
 		{
 			throw 'catno:'.$catno.' not exists!!(can\'t update)';
 		}
+
+		if (!$exists)
+		{
+			$catalog = new Catalog;
+			$catalog->catno = $catno;
+		}
+
+		foreach ($dirty as $name => $value)
+		{
+			$catalog->$name = $value;
+		}
+
+
 
 		$save = $catalog->save();
 

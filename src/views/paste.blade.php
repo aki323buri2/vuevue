@@ -14,8 +14,6 @@ $cache = (array)@json_decode($cache);
 
 $app->useDatabase();
 
-// dump(DB::table('catalog')->get());
-
 ?>
 @push('styles')
 <style>
@@ -45,10 +43,13 @@ $(function ()
 
 	$(hot.rootElement).on('catalog.validate', catalogValidate);
 
-	var data = JSON.parse('{!! json_encode($cache, JSON_UNESCAPED_UNICODE) !!}');
-	hot.loadData(data);
-	hot.setDataAtCell(0, 0, hot.getDataAtCell(0, 0));
-
+	(function ()
+	{
+		// test from cache
+		var data = JSON.parse('{!! json_encode($cache, JSON_UNESCAPED_UNICODE) !!}');
+		hot.loadData(data);
+		hot.setDataAtCell(0, 0, hot.getDataAtCell(0, 0));
+	});
 });
 function handson(el)
 {
