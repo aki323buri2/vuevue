@@ -33,7 +33,7 @@ class Catalog extends Model
 
 		$this->primaryKey = $columns->first()->name;
 	}
-	
+
 	protected static function initColumns()
 	{
 		if (static::$columns !== null) return;
@@ -43,7 +43,7 @@ class Catalog extends Model
 			, 
 			[
 				['catno'  , 'string' , 'カタログＣＤ'], 
-				['shcds'  , 'string' , 'ｼｮｸﾘｭｰＣＤ'], 
+				['shcds'  , 'string' , 'ショクリュｰＣＤ'], 
 				['eoscd'  , 'string' , 'ＥＯＳＣＤ'], 
 				['makeme' , 'string' , 'メーカー名'], 
 				['shiren' , 'string' , '仕入先ＣＤ'], 

@@ -15,6 +15,8 @@ class HomeController extends Controller
 	{
 		Route::get('/', __CLASS__.'@index');
 		Route::get('/home', __CLASS__.'@index');
+		Route::get('/home/list', __CLASS__.'@list');
+		Route::post('/home/list', __CLASS__.'@list');
 		Route::get('/home/paste', __CLASS__.'@paste');
 		Route::post('/home/validate', __CLASS__.'@validate');
 		Route::post('/home/dirty', __CLASS__.'@dirty');
@@ -36,6 +38,12 @@ class HomeController extends Controller
 		return View::make('home', [
 				'catalog' => $catalog, 
 			]);
+	}
+	public function list(Request $request)
+	{
+		$list = $this->catalog->get();
+
+		return $list->toJson(JSON_UNESCAPED_UNICODE);
 	}
 	public function paste(Request $request)
 	{

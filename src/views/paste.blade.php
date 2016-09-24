@@ -95,6 +95,11 @@ function handsonAfterChange(changes, state)
 		var object = {};
 		$.each(values, function (col, value)
 		{
+			//3桁カンマ区切りを取り除く
+			if (value.match(/^\s?(\-?[0-9]{0,3})?(\,[0-9]{3})*(\.[0-9]+)?\s?$/))
+			{
+				value = value.replace(',', '');
+			}
 			var prop = hot.colToProp(col);
 			object[prop] = value;
 		});

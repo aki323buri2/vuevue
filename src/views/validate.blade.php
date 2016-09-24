@@ -155,6 +155,11 @@ $(function ()
 			var exists = data.exists;
 			var dirty = data.dirty;
 
+			if (tr.parent().find('.vaidating').length === 0)
+			{
+				tr.closest('table').trigger('validate:dirty-check-complete');
+			}
+
 			if (exists && dirty.length === 0) return;
 
 			var operation = !exists 
@@ -179,10 +184,6 @@ $(function ()
 				td.addClass('dirty table-' + operation.color);
 			});
 
-			if (tr.parent().find('.vaidating').length === 0)
-			{
-				tr.closest('table').trigger('validate:dirty-check-complete');
-			}
 		});
 		table.on('validate:dirty-check-complete', function (e)
 		{
@@ -203,6 +204,8 @@ $(function ()
 		});
 		$.fn.save = function ()
 		{
+			if (this.length === 0) return this;
+			
 			if (this.get(0).tagName.toLowerCase() === 'table')
 			{
 				this.find('tbody tr.dirty:not(.locked)')
