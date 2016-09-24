@@ -33,6 +33,7 @@ class Catalog extends Model
 
 		$this->primaryKey = $columns->first()->name;
 	}
+	
 	protected static function initColumns()
 	{
 		if (static::$columns !== null) return;
@@ -56,7 +57,6 @@ class Catalog extends Model
 			, 'name'
 		);
 		static::$columns = $columns;
-
 	}
 
 	public function getColumns()
