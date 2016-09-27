@@ -8,7 +8,7 @@ use Illuminate\Database\DatabaseManager;
 
 class Catalog extends Model
 {
-	protected static $columns;
+	protected static $columns = null;
 
 	protected $table = 'catalog';
 	

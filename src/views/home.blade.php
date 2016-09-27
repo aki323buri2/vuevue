@@ -57,6 +57,31 @@ $timestamps = matrix(
 
 <p>home</p>
 
+<style>
+#modal1
+{
+}
+#modal1 iframe
+{
+	width: 100%;
+	height: 400px;
+}
+</style>
+
+<!-- Large modal -->
+<button class="btn btn-primary" data-toggle="modal" data-target="#modal1">Large modal</button>
+
+<div class="modal fade" id="modal1" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			
+			<iframe src="" frameborder="0"></iframe>
+
+		</div>
+	</div>
+</div>
+
+
 <table class="table table-sm table-bordered table-hover" id="table1">
 	<thead>
 		<tr>
