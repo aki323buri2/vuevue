@@ -77,12 +77,22 @@ class HomeController extends Controller
 	}
 	public function card(Request $request, $catno)
 	{
-		dump($catno);
-		exit;
+		$catalog = $this->catalog;
+		$data = $request->input('data');
+
+		if (is_null($data))
+		{
+			$data = (object)$catalog->find($catno)->toArray();
+		}
+		else 
+		{
+			$data = json_decode($data);
+		}
 
 		return View::make('card', [
-			'catalog' => $this->catalog, 
+			'catalog' => $catalog, 
 			'catno' => $catno, 
+			'data' => $data, 
 		]);
 	}
 
