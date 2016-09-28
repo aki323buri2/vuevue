@@ -25,9 +25,10 @@ class HomeController extends Controller
 		];
 		foreach ($methods as $method)
 		{
-			Route::get ('/home/'.$method, __CLASS__.'@'.$method);
-			Route::post('/home/'.$method, __CLASS__.'@'.$method);
+			Route::match(['get', 'post'], '/home/'.$method, __CLASS__.'@'.$method);
 		}
+
+		Route::match(['get', 'post'], '/home/card/{catno?}', __CLASS__.'@card');
 	}
 
 	protected $catalog;
@@ -74,6 +75,17 @@ class HomeController extends Controller
 				'data' => $data, 
 			]);
 	}
+	public function card(Request $request, $catno)
+	{
+		dump($catno);
+		exit;
+
+		return View::make('card', [
+			'catalog' => $this->catalog, 
+			'catno' => $catno, 
+		]);
+	}
+
 	public function dirty(Request $request)
 	{
 

@@ -157,7 +157,7 @@ function loadPlugins()
 		var tr = this;
 		var catno = tr.data('catno');
 
-		console.log(catno);
+		location.href = '/home/card/'+catno;
 	};
 };
 </script>
