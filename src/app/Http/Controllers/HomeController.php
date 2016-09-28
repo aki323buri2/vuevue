@@ -15,12 +15,19 @@ class HomeController extends Controller
 	{
 		Route::get('/', __CLASS__.'@index');
 		Route::get('/home', __CLASS__.'@index');
-		Route::get('/home/list', __CLASS__.'@list');
-		Route::post('/home/list', __CLASS__.'@list');
-		Route::get('/home/paste', __CLASS__.'@paste');
-		Route::post('/home/validate', __CLASS__.'@validate');
-		Route::post('/home/dirty', __CLASS__.'@dirty');
-		Route::post('/home/save', __CLASS__.'@save');
+
+		$methods = [
+			'list', 
+			'paste', 
+			'validate', 
+			'dirty', 
+			'save', 
+		];
+		foreach ($methods as $method)
+		{
+			Route::get ('/home/'.$method, __CLASS__.'@'.$method);
+			Route::post('/home/'.$method, __CLASS__.'@'.$method);
+		}
 	}
 
 	protected $catalog;
