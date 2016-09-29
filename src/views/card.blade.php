@@ -32,12 +32,13 @@ $columns = $catalog::getColumns();
 <div class="card card-block">
 	<h4 class="card-title">
 		{{ $catno }}
-		<span v-text="values.hinmei"></span>
-		<span v-text="values.sanchi"></span>
-		<span v-text="values.tenyou"></span>
-		<span v-text="values.mekame"></span>
+		@{{ values.hinmei }}
+		@{{ values.sanchi }}
+		@{{ values.tenyou }}
+		@{{ values.mekame }}
 	</h4>
 	<p class="card-text">
+		@{{ check.exists }}
 		Some quick example text to build on the card title and make up the bulk of the card's content.
 	</p>
 	<p>
@@ -66,8 +67,8 @@ $columns = $catalog::getColumns();
 	
 </form>
 
-	<a href="#" class="card-link save" >Save</a>
-	<a href="#" class="card-link cancel" >Cancel</a>
+	<a href="#" class="card-link save">Save</a>
+	<a href="#" class="card-link cancel">Cancel</a>
 </div>
 
 <script>
@@ -79,7 +80,11 @@ $(function ()
 	
 	container.vueThis();
 
-	var save = container.find('.save');
+	container.on('click', '.save', function (e)
+	{
+		e.preventDefault();
+		container.check();
+	});
 
 
 });
@@ -90,6 +95,7 @@ function initPlugins()
 		var data = {};
 		data.titles = {};
 		data.values = {};
+		data.check = {};
 		@foreach ($columns as $name => $column)
 		data.titles['{{ $name }}'] = '{{ $column->title }}';
 		@endforeach
@@ -98,12 +104,38 @@ function initPlugins()
 		data.values['{{ $name }}'] = '{{ $value }}';
 		@endforeach
 
-		new Vue({
+		var vue = new Vue({
 			el: this[0]
 			, data: data 
 		});
 
+		this.vue = vue;
+
+		vue.$set('check.exists', '...');
+
+		console.log(vue.check.exists);
+
 		return this;
+	};
+	$.fn.check = function ()
+	{
+		var container = this;
+		var vue = container.vue;
+		var record = JSON.stringify(vue.values);
+
+		$.ajax({
+			url: '/home/dirty'
+			, type: 'post'
+			, data: { record: record }
+		})
+		.done(function (data)
+		{
+			var check = JSON.parse(data);
+			var exists = check.exists;
+			var dirty = check.dirty;
+
+			vue.$set('check.exists', exists ? '修正' : '新規');
+		});
 	};
 };
 </script>
