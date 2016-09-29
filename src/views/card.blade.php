@@ -19,6 +19,7 @@ $columns = $catalog::getColumns();
 {
 	/*overflow: hidden;*/
 	white-space: nowrap;
+	cursor: pointer;
 }
 </style>
 @endpush
@@ -46,24 +47,22 @@ $columns = $catalog::getColumns();
 
 <form id="form1">
 	
-	@foreach ($columns as $column)
-	<div class="form-group row">
-		<label for="{{ $column->name }}" class="col-sm-2">
-			{{ $column->title }}
+	<div class="form-group row" v-for="title in titles">
+		<label for="@{{ $key }}" class="col-sm-2">
+			@{{ title }}
 		</label>
 		<div class="col-sm-10">
 			<input 
 				type="text"
 				class="form-control"
-				id="{{ $column->name }}"
-				placeholder="{{ $column->title }}"
+				id="@{{ $key }}"
+				placeholder="@{{ title }}"
 
-				v-model="values.{{ $column->name }}"
+				v-model="values[$key]"
 			>
 		</div>
 			
 	</div>
-	@endforeach
 	
 </form>
 
@@ -77,8 +76,11 @@ $(function ()
 	var data = {};
 	data.titles = {};
 	data.values = {};
+	@foreach ($columns as $name => $column)
+	data.titles['{{ $name }}'] = '{{ $column->title }}';
+	@endforeach
+
 	@foreach ($data as $name => $value)
-	data.titles['{{ $name }}'] = '{{ @$columns[$name]->title }}';
 	data.values['{{ $name }}'] = '{{ $value }}';
 	@endforeach
 
