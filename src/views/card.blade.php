@@ -66,29 +66,46 @@ $columns = $catalog::getColumns();
 	
 </form>
 
-	<a href="#" class="card-link">Card link</a>
-	<a href="#" class="card-link">Another link</a>
+	<a href="#" class="card-link save" >Save</a>
+	<a href="#" class="card-link cancel" >Cancel</a>
 </div>
 
 <script>
 $(function ()
 {
-	var data = {};
-	data.titles = {};
-	data.values = {};
-	@foreach ($columns as $name => $column)
-	data.titles['{{ $name }}'] = '{{ $column->title }}';
-	@endforeach
+	initPlugins();
 
-	@foreach ($data as $name => $value)
-	data.values['{{ $name }}'] = '{{ $value }}';
-	@endforeach
+	var container = $('#container1');
+	
+	container.vueThis();
 
-	new Vue({
-		el: '#container1'
-		, data: data 
-	});
+	var save = container.find('.save');
+
+
 });
+function initPlugins()
+{
+	$.fn.vueThis = function ()
+	{
+		var data = {};
+		data.titles = {};
+		data.values = {};
+		@foreach ($columns as $name => $column)
+		data.titles['{{ $name }}'] = '{{ $column->title }}';
+		@endforeach
+
+		@foreach ($data as $name => $value)
+		data.values['{{ $name }}'] = '{{ $value }}';
+		@endforeach
+
+		new Vue({
+			el: this[0]
+			, data: data 
+		});
+
+		return this;
+	};
+};
 </script>
 
 @endsection
