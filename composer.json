@@ -12,6 +12,7 @@
     	, "illuminate/database": "*"
         , "illuminate/console": "*"
         , "symfony/process": "*"
+        , "doctrine/dbal": "*"
     }
     , "autoload": {
         "files": [

@@ -45,7 +45,7 @@ class Catalog extends Model
 				['catno'  , 'string' , 'カタログＣＤ'], 
 				['shcds'  , 'string' , 'ショクリュｰＣＤ'], 
 				['eoscd'  , 'string' , 'ＥＯＳＣＤ'], 
-				['makeme' , 'string' , 'メーカー名'], 
+				['mekame' , 'string' , 'メーカー名'], 
 				['shiren' , 'string' , '仕入先ＣＤ'], 
 				['hinmei' , 'string' , '品名'], 
 				['sanchi' , 'string' , '産地'], 

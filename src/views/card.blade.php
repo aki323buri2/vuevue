@@ -15,6 +15,11 @@ $columns = $catalog::getColumns();
 	width: 600px;
 	margin-top: 2rem;
 }
+#form1 .form-group.row label
+{
+	/*overflow: hidden;*/
+	white-space: nowrap;
+}
 </style>
 @endpush
 
@@ -26,27 +31,37 @@ $columns = $catalog::getColumns();
 <div class="card card-block">
 	<h4 class="card-title">
 		{{ $catno }}
-		<span v-text="hinmei"></span>
+		<span v-text="values.hinmei"></span>
+		<span v-text="values.sanchi"></span>
+		<span v-text="values.tenyou"></span>
+		<span v-text="values.mekame"></span>
 	</h4>
 	<p class="card-text">
 		Some quick example text to build on the card title and make up the bulk of the card's content.
+	</p>
+	<p>
+		<div class="created_at">@{{ values.created_at }} 登録</div>
+		<div class="updated_at">@{{ values.updated_at }} 修正</div>
 	</p>
 
 <form id="form1">
 	
 	@foreach ($columns as $column)
-	<div class="form-group">
-		<label for="{{ $column->name }}">
+	<div class="form-group row">
+		<label for="{{ $column->name }}" class="col-sm-2">
 			{{ $column->title }}
 		</label>
-		<input 
-			type="text"
-			class="form-control"
-			id="{{ $column->name }}"
-			placeholder="{{ $column->title }}"
+		<div class="col-sm-10">
+			<input 
+				type="text"
+				class="form-control"
+				id="{{ $column->name }}"
+				placeholder="{{ $column->title }}"
 
-			v-model="{{ $column->name }}"
-		>
+				v-model="values.{{ $column->name }}"
+			>
+		</div>
+			
 	</div>
 	@endforeach
 	
@@ -60,8 +75,11 @@ $columns = $catalog::getColumns();
 $(function ()
 {
 	var data = {};
+	data.titles = {};
+	data.values = {};
 	@foreach ($data as $name => $value)
-	data['{{ $name }}'] = '{{ $value }}';
+	data.titles['{{ $name }}'] = '{{ @$columns[$name]->title }}';
+	data.values['{{ $name }}'] = '{{ $value }}';
 	@endforeach
 
 	new Vue({
