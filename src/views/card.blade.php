@@ -37,10 +37,14 @@ $columns = $catalog::getColumns();
 		@{{ values.tenyou }}
 		@{{ values.mekame }}
 	</h4>
-	<p class="card-text">
-		@{{ !check.exists ? '新規' : '修正' }} : 
+	
+	<div class="tag tag-@{{ bsClass }}">
+		@{{ existsText }}
+	</div>
+	<div class="tag tag-@{{ bsClass }}">
 		@{{ dirtyCount }}件の不一致項目があります。
-	</p>
+	</div>
+
 	<p>
 		<div class="created_at">@{{ values.created_at }} 登録</div>
 		<div class="updated_at">@{{ values.updated_at }} 修正</div>
@@ -48,18 +52,20 @@ $columns = $catalog::getColumns();
 
 <form id="form1">
 	
-	<div class="form-group row" v-for="title in titles">
+	<div class="form-group row @{{ $key }}" v-for="title in titles">
 		<label for="@{{ $key }}" class="col-sm-2">
 			@{{ title }}
 		</label>
 		<div class="col-sm-10">
 			<input 
 				type="text"
-				class="form-control"
+				class="form-control @{{ $key }}"
 				id="@{{ $key }}"
 				placeholder="@{{ title }}"
 
 				v-model="values[$key]"
+
+				v-on:change="inputOnChange"
 			>
 		</div>
 			
@@ -110,17 +116,36 @@ function initPlugins()
 		data.check.dirty = {};
 
 		// computed for vue
-		var computed = {};
-		computed.dirtyCount = function ()
-		{
-			return Object.keys(this.check.dirty).length;
+		var computed = {
+			  dirtyCount: function ()
+			{
+				return Object.keys(this.check.dirty).length;
+			}
+			, bsClass: function ()
+			{
+				return !this.check.exists ? 'danger' : 'info';
+			}
+			, existsText : function ()
+			{
+				return !this.check.exists ? '新規' : '修正';
+			}
 		};
 
-		// vue instantiation
+
+		// methods for vue
+		var methods = {
+			  inputOnChange: function (e)
+			{
+				$(this.$el).check();
+			}
+		};
+
+		// vue compile
 		var vue = new Vue({
 			el: this[0]
 			, data: data 
 			, computed: computed
+			, methods: methods
 		});
 
 		this.prop('vue', vue);
@@ -147,7 +172,12 @@ function initPlugins()
 			vue.check.exists = exists;
 			vue.check.dirty = dirty;
 
-			console.log(dirty);
+			container.find('.form-group.row').removeClass('has-danger');
+
+			$.each(check.dirty, function (name, value)
+			{
+				container.find('.form-group.row.'+name).addClass('has-danger');
+			});
 		});
 	};
 };
