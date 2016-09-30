@@ -38,8 +38,8 @@ $columns = $catalog::getColumns();
 		@{{ values.mekame }}
 	</h4>
 	<p class="card-text">
-		@{{ check.exists }}
-		Some quick example text to build on the card title and make up the bulk of the card's content.
+		@{{ !check.exists ? '新規' : '修正' }} : 
+		@{{ dirtyCount }}件の不一致項目があります。
 	</p>
 	<p>
 		<div class="created_at">@{{ values.created_at }} 登録</div>
@@ -80,18 +80,20 @@ $(function ()
 	
 	container.vueThis();
 
+	container.check();
+
 	container.on('click', '.save', function (e)
 	{
 		e.preventDefault();
 		container.check();
 	});
 
-
 });
 function initPlugins()
 {
 	$.fn.vueThis = function ()
 	{
+		// data for vue
 		var data = {};
 		data.titles = {};
 		data.values = {};
@@ -104,15 +106,22 @@ function initPlugins()
 		data.values['{{ $name }}'] = '{{ $value }}';
 		@endforeach
 
-		data.check.exists = '';
-		data.check.dirty = [];
+		data.check.exists = false;
+		data.check.dirty = {};
 
+		// computed for vue
+		var computed = {};
+		computed.dirtyCount = function ()
+		{
+			return Object.keys(this.check.dirty).length;
+		};
+
+		// vue instantiation
 		var vue = new Vue({
 			el: this[0]
 			, data: data 
+			, computed: computed
 		});
-
-		data.check.exists = '....';
 
 		this.prop('vue', vue);
 
@@ -135,7 +144,10 @@ function initPlugins()
 			var exists = check.exists;
 			var dirty = check.dirty;
 
-			vue.check.exists = (exists ? '修正' : '新規');
+			vue.check.exists = exists;
+			vue.check.dirty = dirty;
+
+			console.log(dirty);
 		});
 	};
 };
