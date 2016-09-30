@@ -11,6 +11,7 @@ use App\Catalog;
 
 class HomeController extends Controller 
 {
+	// ルーティング
 	public static function routes()
 	{
 		Route::get('/', __CLASS__.'@index');
@@ -22,6 +23,8 @@ class HomeController extends Controller
 			'validate', 
 			'dirty', 
 			'save', 
+
+			'test', 
 		];
 		foreach ($methods as $method)
 		{
@@ -29,6 +32,12 @@ class HomeController extends Controller
 		}
 
 		Route::match(['get', 'post'], '/home/card/{catno?}', __CLASS__.'@card');
+	}
+
+	// とりあえずView
+	public function __call($func, $args)
+	{
+		return View::make($func, ['catalog' => $this->catalog]);
 	}
 
 	protected $catalog;

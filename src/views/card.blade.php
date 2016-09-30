@@ -104,23 +104,24 @@ function initPlugins()
 		data.values['{{ $name }}'] = '{{ $value }}';
 		@endforeach
 
+		data.check.exists = '';
+		data.check.dirty = [];
+
 		var vue = new Vue({
 			el: this[0]
 			, data: data 
 		});
 
-		this.vue = vue;
+		data.check.exists = '....';
 
-		vue.$set('check.exists', '...');
-
-		console.log(vue.check.exists);
+		this.prop('vue', vue);
 
 		return this;
 	};
 	$.fn.check = function ()
 	{
 		var container = this;
-		var vue = container.vue;
+		var vue = container.prop('vue');
 		var record = JSON.stringify(vue.values);
 
 		$.ajax({
@@ -134,7 +135,7 @@ function initPlugins()
 			var exists = check.exists;
 			var dirty = check.dirty;
 
-			vue.$set('check.exists', exists ? '修正' : '新規');
+			vue.check.exists = (exists ? '修正' : '新規');
 		});
 	};
 };
