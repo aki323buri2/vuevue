@@ -41,7 +41,7 @@ $columns = $catalog::getColumns();
 	<div class="tag tag-@{{ bsClass }}">
 		@{{ existsText }}
 	</div>
-	<div class="tag tag-@{{ bsClass }}">
+	<div class="tag tag-@{{ dirtyCount ? 'danger' : 'default' }}">
 		@{{ dirtyCount }}件の不一致項目があります。
 	</div>
 
@@ -121,13 +121,34 @@ function initPlugins()
 			{
 				return Object.keys(this.check.dirty).length;
 			}
+			, operation: function ()
+			{
+				if (this.dirtyCount > 0)
+				{
+					return !this.check.exists ? 'insert' : 'update';
+				}
+				else
+				{
+					return 'none';
+				}
+			}
 			, bsClass: function ()
 			{
-				return !this.check.exists ? 'danger' : 'info';
+				switch (this.operation)
+				{
+					case 'insert' : return 'danger';
+					case 'update' : return 'info';
+					case 'none' : return 'default';
+				}
 			}
 			, existsText : function ()
 			{
-				return !this.check.exists ? '新規' : '修正';
+				switch (this.operation)
+				{
+					case 'insert' : return '新規';
+					case 'update' : return '修正';
+					case 'none' : return '変更なし';
+				}
 			}
 		};
 
