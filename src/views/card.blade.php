@@ -31,12 +31,7 @@ $columns = $catalog::getColumns();
 
 <div class="card card-block">
 	<h4 class="card-title">
-		[
-		<span v-show="operation === 'insert'">
-			({{ $catno }}=>)
-		</span>
-		@{{ values.catno }}
-		]
+		[@{{ values.catno }}]
 		@{{ values.hinmei }}
 		@{{ values.sanchi }}
 		@{{ values.tenyou }}
@@ -54,7 +49,7 @@ $columns = $catalog::getColumns();
 			<div 
 				class="tag tag-@{{ dirtyCount ? 'danger' : 'default' }}"
 			>
-				@{{ dirtyCount }}件
+				@{{ dirtyCount }}項目
 			</div>
 		</span>
 	</div>

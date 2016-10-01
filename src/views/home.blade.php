@@ -150,6 +150,8 @@ function loadPlugins()
 				.append($('<i>').addClass('fa fa-edit'))
 			;
 		});
+
+		return this;
 		
 	};
 	$.fn.showCard = function ()
@@ -158,6 +160,8 @@ function loadPlugins()
 		var catno = tr.data('catno');
 
 		location.href = '/home/card/'+catno;
+
+		return this;
 	};
 };
 </script>
