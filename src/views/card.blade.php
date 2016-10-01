@@ -39,16 +39,13 @@ $columns = $catalog::getColumns();
 	</h4>
 	
 	<div class="operation" v-show="operation !== 'none'" transition="collapse">
+
 		<div class="tag tag-@{{ bsClass }}">
 			@{{ existsText }}
 		</div>
 
-		<span
-			v-show="dirtyCount > 0"
-		>
-			<div 
-				class="tag tag-@{{ dirtyCount ? 'danger' : 'default' }}"
-			>
+		<span v-show="dirtyCount > 0">
+			<div class="tag tag-@{{ bsClass }}">
 				@{{ dirtyCount }}項目
 			</div>
 		</span>
@@ -251,13 +248,13 @@ function initPlugins()
 			{
 				$(el).collapse('show');
 			}
-			, enterCancelled: function (el)
-			{
-				$(el).stop();
-			}
 			, leave: function (el, done)
 			{
 				$(el).collapse('hide');
+			}
+			, enterCancelled: function (el)
+			{
+				$(el).stop();
 			}
 			, leaveCancelled: function (el)
 			{

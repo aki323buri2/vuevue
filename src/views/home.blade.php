@@ -50,6 +50,12 @@ $timestamps = matrix(
 	position: absolute;
 	margin-left: -7rem;
 }
+
+#modal1 .iframe1
+{
+	width: 100%;
+	height: 700px;
+}
 </style>
 @endpush
 
@@ -57,16 +63,29 @@ $timestamps = matrix(
 
 <p>home</p>
 
-<style>
-#modal1
-{
-}
-#modal1 iframe
-{
-	width: 100%;
-	height: 400px;
-}
-</style>
+<!-- Large modal -->
+<div
+	id="modal1" 
+	class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="gridModalLabel">Modal title</h4>
+			</div>
+			
+			<div class="modal-body">
+				<div class="modal-content">
+					<iframe src="" frameborder="0" class="iframe1"></iframe>
+				</div>
+			</div>
+		
+		</div>
+	</div>
+</div>
+
+
 
 <table class="table table-sm table-bordered table-hover" id="table1">
 	<thead>
@@ -144,11 +163,21 @@ function loadPlugins()
 					.addClass(name).text(value)
 				;
 			});
+
+			// tag
 			var tag = $('<span>')
 				.addClass('tag tag-pill tag-info card')
 				.appendTo(tr.find('.catno'))
 				.append($('<i>').addClass('fa fa-edit'))
 			;
+
+			// tooltip on tag
+			tag
+				.data({toggle: 'tooltip', placement:'top'})
+				.prop({title: row.hinmei+' ('+row.catno+') の編集'})
+				.tooltip()
+			;
+			 
 		});
 
 		return this;
@@ -159,9 +188,37 @@ function loadPlugins()
 		var tr = this;
 		var catno = tr.data('catno');
 
-		location.href = '/home/card/'+catno;
+		var href = '/home/card/'+catno;
+
+		var modal = $('#modal1');
+		var iframe = modal.find('.iframe1');
+
+		iframe.prop('src', href);
+
+		modal.modal('show');
+
+		modal
+			.offon('shown.bs.modal', shown)
+			.offon('hidden.bs.modal', hidden)
+		;
+		
+		function shown(e)
+		{
+			iframe.focus();
+			tr.addClass('table-danger');
+		}
+		function hidden(e)
+		{
+			iframe.prop('src', null);
+			tr.removeClass('table-danger');
+		}
+
 
 		return this;
+	};
+	$.fn.offon = function (type, callback)
+	{
+		return this.off(type).on(type, callback);
 	};
 };
 </script>
