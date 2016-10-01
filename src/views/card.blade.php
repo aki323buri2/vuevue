@@ -31,18 +31,32 @@ $columns = $catalog::getColumns();
 
 <div class="card card-block">
 	<h4 class="card-title">
-		{{ $catno }}
+		[
+		<span v-show="operation === 'insert'">
+			({{ $catno }}=>)
+		</span>
+		@{{ values.catno }}
+		]
 		@{{ values.hinmei }}
 		@{{ values.sanchi }}
 		@{{ values.tenyou }}
 		@{{ values.mekame }}
 	</h4>
 	
-	<div class="tag tag-@{{ bsClass }}">
-		@{{ existsText }}
-	</div>
-	<div class="tag tag-@{{ dirtyCount ? 'danger' : 'default' }}">
-		@{{ dirtyCount }}件の不一致項目があります。
+	<div class="operation" v-show="operation !== 'none'" transition="collapse">
+		<div class="tag tag-@{{ bsClass }}">
+			@{{ existsText }}
+		</div>
+
+		<span
+			v-show="dirtyCount > 0"
+		>
+			<div 
+				class="tag tag-@{{ dirtyCount ? 'danger' : 'default' }}"
+			>
+				@{{ dirtyCount }}件
+			</div>
+		</span>
 	</div>
 
 	<p>
@@ -50,31 +64,30 @@ $columns = $catalog::getColumns();
 		<div class="updated_at">@{{ values.updated_at }} 修正</div>
 	</p>
 
-<form id="form1">
-	
-	<div class="form-group row @{{ $key }}" v-for="title in titles">
-		<label for="@{{ $key }}" class="col-sm-2">
-			@{{ title }}
-		</label>
-		<div class="col-sm-10">
-			<input 
-				type="text"
-				class="form-control @{{ $key }}"
-				id="@{{ $key }}"
-				placeholder="@{{ title }}"
+	<form id="form1">
+		
+		<div class="form-group row @{{ $key }}" v-for="title in titles">
+			<label for="@{{ $key }}" class="col-sm-2">
+				@{{ title }}
+			</label>
+			<div class="col-sm-10">
+				<input 
+					type="text"
+					class="form-control @{{ $key }}"
+					id="@{{ $key }}"
+					placeholder="@{{ title }}"
 
-				v-model="values[$key]"
+					v-model="values[$key]"
 
-				v-on:change="inputOnChange"
-			>
+					v-on:keyup="inputOnChange"
+					v-on:change="inputOnChange"
+				>
+			</div>
+				
 		</div>
-			
-	</div>
-	
-</form>
+		
+	</form>
 
-	<a href="#" class="card-link save">Save</a>
-	<a href="#" class="card-link cancel">Cancel</a>
 </div>
 
 <script>
@@ -88,18 +101,39 @@ $(function ()
 
 	container.check();
 
-	container.on('click', '.save', function (e)
-	{
-		e.preventDefault();
-		container.check();
-	});
+	container.find('.form-control.shcds').select();
 
 });
+/**
+ * init plugins 
+ * @return {jquery object} 
+ */
 function initPlugins()
 {
 	$.fn.vueThis = function ()
 	{
-		// data for vue
+		// register trasition 
+		transition();
+
+		// vue compile
+		var vue = new Vue({
+			el: this[0]
+			, data: vueData() 
+			, computed: vueComputed()
+			, methods: vueMethods()
+		});
+		this.prop('vue', vue);
+
+
+		return this;
+	};
+
+	/**
+	 * data for vue
+	 * @return {object}
+	 */
+	function vueData()
+	{
 		var data = {};
 		data.titles = {};
 		data.values = {};
@@ -115,8 +149,16 @@ function initPlugins()
 		data.check.exists = false;
 		data.check.dirty = {};
 
-		// computed for vue
-		var computed = {
+		return data;
+	}
+
+	/**
+	 * computed for vue
+	 * @return {object}
+	 */
+	function vueComputed()
+	{
+		return {
 			  dirtyCount: function ()
 			{
 				return Object.keys(this.check.dirty).length;
@@ -151,28 +193,26 @@ function initPlugins()
 				}
 			}
 		};
+	}
 
-
-		// methods for vue
-		var methods = {
-			  inputOnChange: function (e)
+	/**
+	 * methods for vue
+	 * @return {object}
+	 */
+	function vueMethods()
+	{
+		return {
+			inputOnChange: function (e)
 			{
 				$(this.$el).check();
 			}
 		};
-
-		// vue compile
-		var vue = new Vue({
-			el: this[0]
-			, data: data 
-			, computed: computed
-			, methods: methods
-		});
-
-		this.prop('vue', vue);
-
-		return this;
 	};
+
+	/**
+	 * check exists and dirty by ajax
+	 * @return jquery {object}
+	 */
 	$.fn.check = function ()
 	{
 		var container = this;
@@ -200,7 +240,36 @@ function initPlugins()
 				container.find('.form-group.row.'+name).addClass('has-danger');
 			});
 		});
+
+		return this;
 	};
+
+	/**
+	 * register transition
+	 * @return hook
+	 */
+	function transition()
+	{
+		Vue.transition('collapse', {
+			css: false
+			, enter: function (el, done)
+			{
+				$(el).collapse('show');
+			}
+			, enterCancelled: function (el)
+			{
+				$(el).stop();
+			}
+			, leave: function (el, done)
+			{
+				$(el).collapse('hide');
+			}
+			, leaveCancelled: function (el)
+			{
+				$(el).stop();
+			}
+		});
+	}
 };
 </script>
 
