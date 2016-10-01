@@ -195,21 +195,22 @@ function loadPlugins()
 
 		iframe.prop('src', href);
 
-		modal.modal('show');
 
 		modal
 			.offon('shown.bs.modal', shown)
 			.offon('hidden.bs.modal', hidden)
 		;
+
+		tr.addClass('table-danger');
+		modal.modal('show');
 		
 		function shown(e)
 		{
 			iframe.focus();
-			tr.addClass('table-danger');
 		}
 		function hidden(e)
 		{
-			iframe.prop('src', null);
+			iframe.removeProp('src');
 			tr.removeClass('table-danger');
 		}
 

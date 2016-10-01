@@ -1,7 +1,7 @@
 @extends('layouts/master')
 <?php
 $links = array_merge((array)@$links, [
-	'/vendor/vue/dist/vue.js',
+	'/vendor/vue/dist/vue.min.js',
 ]);
 
 $columns = $catalog::getColumns();
@@ -251,14 +251,6 @@ function initPlugins()
 			, leave: function (el, done)
 			{
 				$(el).collapse('hide');
-			}
-			, enterCancelled: function (el)
-			{
-				$(el).stop();
-			}
-			, leaveCancelled: function (el)
-			{
-				$(el).stop();
 			}
 		});
 	}
