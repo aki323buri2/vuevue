@@ -23,6 +23,7 @@ class HomeController extends Controller
 			'validate', 
 			'dirty', 
 			'save', 
+			'denpyo', 
 
 			'test', 
 		];

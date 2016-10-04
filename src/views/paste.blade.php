@@ -27,7 +27,10 @@ table tr > th
 
 @section('main')
 
-<p>コピー＆ペースト</p>
+<p>
+	<i class="fa fa-copy"></i>
+	コピー＆ペースト
+</p>
 
 <div id="validate"></div>
 

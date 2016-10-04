@@ -29,10 +29,13 @@
 
 		<span class="tag tag-info tag-pill pull-xs-right">5</span>
 	</a>
-	<li class="list-group-item">
+	<a href="/denpyo" class="list-group-item list-group-item-action">
+		
+		<i class="fa fa-truck"></i>
+		配送伝票
+
 		<span class="tag tag-default tag-pill pull-xs-right">2</span>
-		Dapibus ac facilisis in
-	</li>
+	</a>
 	<li class="list-group-item">
 		<span class="tag tag-default tag-pill pull-xs-right">1</span>
 		Morbi leo risus
