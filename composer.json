@@ -13,6 +13,7 @@
         , "illuminate/console": "*"
         , "symfony/process": "*"
         , "doctrine/dbal": "*"
+        , "goodby/csv": "*"
     }
     , "autoload": {
         "files": [

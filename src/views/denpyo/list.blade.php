@@ -43,16 +43,46 @@ $links = array_merge((array)@$links, [
 	配送伝票
 </p>
 
-<div action="/file-upload" class="dropzone">
-  <div class="fallback">
-    <input name="file" type="file" multiple />
-  </div>
-</div>
+
+<div class="" id="dropzone1"></div>
 
 <script>
 $(function ()
 {
-	
+	var $dz = $('#dropzone1').addClass('dropzone').dropzone({
+		url: '/denpyo/csv/upload'
+		, accept: function (file, done)
+		{
+			if (file.name.split('.').pop() === 'csv')
+			{
+				done();
+			}
+			else 
+			{
+				var error = 'not csv!';
+				alert(error);
+				done(error);
+				this.removeFile(file);
+			}
+		}
+		, addRemoveLinks: true
+	});
+	var  dz = $dz[0].dropzone;
+	dz.on('addedfile', function (file)
+	{
+		var type = file.type;
+		var ext = file.name.split('.').pop();
+		var img = $(file.previewElement)
+			.find('.dz-image img')
+			.prop('src', '/img/csv512.png')
+			.prop('width', '120')
+		;
+	})
+	.on('success', function (file, response)
+	{
+		console.log(response);
+	})
+	;
 });
 </script>
 
